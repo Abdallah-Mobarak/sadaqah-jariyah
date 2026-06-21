@@ -1,0 +1,20 @@
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="/">
+      <span class="dot"></span>
+      صدقة جارية
+    </a>
+    <nav class="nav">
+      <a href="/" class="<%= path === '/' ? 'active' : '' %>">الرئيسية</a>
+      <a href="/quran" class="<%= path === '/quran' ? 'active' : '' %>">المصحف</a>
+      <a href="/adhkar" class="<%= path === '/adhkar' ? 'active' : '' %>">الأذكار</a>
+      <a href="/tasbeeh" class="<%= path === '/tasbeeh' ? 'active' : '' %>">السبحة</a>
+      <a href="/prayer-times" class="<%= path === '/prayer-times' ? 'active' : '' %>">المواقيت</a>
+      <a href="/add" class="<%= path === '/add' ? 'active' : '' %>">أضف متوفّى</a>
+      <% if (isAdmin) { %>
+        <a href="/admin" class="admin">لوحة التحكم</a>
+      <% } %>
+    </nav>
+  </div>
+</header>
+<main class="container">

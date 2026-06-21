@@ -1,0 +1,84 @@
+<div class="prayer-tool">
+  <div class="quran-controls">
+    <input type="text" class="city-input" placeholder="اكتب اسم مدينتك (مثال: القاهرة)" value="" style="max-width:280px" />
+    <button class="btn sm load-times" type="button">عرض المواقيت</button>
+    <button class="btn ghost sm geo-btn" type="button">📍 موقعي الحالي</button>
+  </div>
+  <div class="muted city-label"></div>
+  <div class="times-grid times-output"></div>
+  <p class="hint">المصدر: Aladhan API. تُحسب حسب طريقة الهيئة المصرية العامة للمساحة افتراضيًا.</p>
+</div>
+
+<script>
+(function(){
+  var root = document.currentScript.previousElementSibling;
+  while (root && !root.classList.contains('prayer-tool')) root = root.previousElementSibling;
+  if (!root) return;
+  var input = root.querySelector('.city-input');
+  var out = root.querySelector('.times-output');
+  var label = root.querySelector('.city-label');
+  var NAMES = { Fajr:'الفجر', Sunrise:'الشروق', Dhuhr:'الظهر', Asr:'العصر', Maghrib:'المغرب', Isha:'العشاء' };
+  var ORDER = ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
+
+  function render(timings){
+    var now = new Date();
+    var nowMin = now.getHours()*60 + now.getMinutes();
+    var nextKey = null;
+    ORDER.forEach(function(k){
+      if (nextKey) return;
+      var p = timings[k].split(':'); var m = parseInt(p[0],10)*60 + parseInt(p[1],10);
+      if (m > nowMin && k !== 'Sunrise') nextKey = k;
+    });
+    out.innerHTML = ORDER.map(function(k){
+      return '<div class="time-cell ' + (k===nextKey?'next':'') + '">' +
+        '<div class="label">' + NAMES[k] + (k===nextKey?' • التالية':'') + '</div>' +
+        '<div class="val">' + to12(timings[k]) + '</div></div>';
+    }).join('');
+  }
+
+  function to12(t){
+    var p = t.split(':'); var h = parseInt(p[0],10); var m = p[1];
+    var ap = h >= 12 ? 'م' : 'ص'; var h12 = h % 12; if (h12 === 0) h12 = 12;
+    return h12 + ':' + m + ' ' + ap;
+  }
+
+  function byCity(city){
+    if (!city) return;
+    label.textContent = '… جارٍ التحميل';
+    fetch('https://api.aladhan.com/v1/timingsByCity?city=' + encodeURIComponent(city) + '&country=&method=5')
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if (j.code !== 200) throw new Error();
+        label.textContent = 'مواقيت اليوم — ' + city;
+        render(j.data.timings);
+        localStorage.setItem('sj_city', city);
+      })
+      .catch(function(){ label.textContent = 'تعذّر العثور على المدينة، جرّب اسمًا آخر.'; });
+  }
+
+  function byCoords(lat, lng){
+    label.textContent = '… جارٍ التحميل';
+    fetch('https://api.aladhan.com/v1/timings?latitude=' + lat + '&longitude=' + lng + '&method=5')
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        label.textContent = 'مواقيت اليوم — موقعك الحالي';
+        render(j.data.timings);
+      })
+      .catch(function(){ label.textContent = 'تعذّر تحديد المواقيت.'; });
+  }
+
+  root.querySelector('.load-times').addEventListener('click', function(){ byCity(input.value.trim()); });
+  input.addEventListener('keydown', function(e){ if (e.key === 'Enter') byCity(input.value.trim()); });
+  root.querySelector('.geo-btn').addEventListener('click', function(){
+    if (!navigator.geolocation) { label.textContent = 'المتصفح لا يدعم تحديد الموقع.'; return; }
+    label.textContent = '… جارٍ تحديد موقعك';
+    navigator.geolocation.getCurrentPosition(
+      function(pos){ byCoords(pos.coords.latitude, pos.coords.longitude); },
+      function(){ label.textContent = 'تعذّر الوصول للموقع، اكتب اسم مدينتك.'; }
+    );
+  });
+
+  var saved = localStorage.getItem('sj_city');
+  if (saved) { input.value = saved; byCity(saved); }
+})();
+</script>

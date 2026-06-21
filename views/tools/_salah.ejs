@@ -1,0 +1,26 @@
+<div class="tasbeeh salah-tool" data-for="<%= forId || '' %>">
+  <div class="phrase">اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ</div>
+  <div class="count scount">0</div>
+  <button class="tap-btn" type="button">صلِّ على النبي ﷺ</button>
+  <p class="hint" style="margin-top:16px">قال ﷺ: «مَن صلّى عليَّ صلاةً صلّى اللهُ عليه بها عشرًا».</p>
+</div>
+
+<script>
+(function(){
+  var root = document.currentScript.previousElementSibling;
+  while (root && !root.classList.contains('salah-tool')) root = root.previousElementSibling;
+  if (!root) return;
+  var forId = root.getAttribute('data-for');
+  var countEl = root.querySelector('.scount');
+  var tap = root.querySelector('.tap-btn');
+  var count = 0;
+  var notified = false;
+  tap.addEventListener('click', function(){
+    count++;
+    countEl.textContent = count;
+    if (navigator.vibrate) navigator.vibrate(12);
+    if (count === 10 || count === 100) { if (window.SJ) SJ.toast('اللهم صلِّ عليه ﷺ — ' + count); }
+    if (!notified && count >= 10 && forId) { notified = true; if (window.SJ) SJ.participate(forId); }
+  });
+})();
+</script>

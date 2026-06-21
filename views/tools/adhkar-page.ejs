@@ -1,0 +1,8 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<section class="section">
+  <h1 style="color:var(--navy)">🌙 أذكار الصباح والمساء</h1>
+  <p class="muted">اضغط على كل ذكر بعدد مرّاته، وانوِ إهداء الأجر لمن تحب.</p>
+  <%- include('_adhkar', { forId: forId, adhkar: adhkar }) %>
+</section>
+<%- include('../partials/footer') %>

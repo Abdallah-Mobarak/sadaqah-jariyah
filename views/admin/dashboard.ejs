@@ -1,0 +1,73 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<section class="section">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+    <h1 style="color:var(--navy);margin:0">لوحة التحكم</h1>
+    <a class="btn ghost sm" href="/admin/logout">تسجيل الخروج</a>
+  </div>
+
+  <h2 style="color:var(--navy)">🕓 طلبات قيد المراجعة <span class="tag badge-pending"><%= pending.length %></span></h2>
+  <% if (pending.length === 0) { %>
+    <div class="card muted center">لا توجد طلبات جديدة.</div>
+  <% } else { %>
+    <% pending.forEach(function(d){ %>
+      <div class="admin-row">
+        <% if (d.photo) { %><img class="thumb" src="<%= d.photo %>" alt="" /><% } else { %><div class="thumb" style="display:flex;align-items:center;justify-content:center;color:#fff">🕊️</div><% } %>
+        <div class="info">
+          <h4><%= d.name %></h4>
+          <% if (d.bio) { %><div class="muted" style="font-size:.9rem"><%= d.bio %></div><% } %>
+          <div><% (d.deeds||[]).forEach(function(k){ var L=(DEEDS.find(function(x){return x.key===k})||{}).label; if(L){ %><span class="tag"><%= L %></span><% }}); %></div>
+        </div>
+        <div class="btn-row">
+          <a class="btn ghost sm" href="/m/<%= d.id %>" target="_blank">معاينة</a>
+          <a class="btn ghost sm" href="/admin/edit/<%= d.id %>">تعديل</a>
+          <form method="POST" action="/admin/approve/<%= d.id %>"><button class="btn sm" type="submit">نشر ✓</button></form>
+          <form method="POST" action="/admin/delete/<%= d.id %>" onsubmit="return confirm('حذف الطلب نهائيًا؟')"><button class="btn danger sm" type="submit">حذف</button></form>
+        </div>
+      </div>
+    <% }); %>
+  <% } %>
+
+  <h2 style="color:var(--navy);margin-top:34px">✅ منشور <span class="tag badge-approved"><%= approved.length %></span></h2>
+  <% if (approved.length === 0) { %>
+    <div class="card muted center">لا توجد صفحات منشورة بعد.</div>
+  <% } else { %>
+    <% approved.forEach(function(d){ %>
+      <div class="admin-row">
+        <% if (d.photo) { %><img class="thumb" src="<%= d.photo %>" alt="" /><% } else { %><div class="thumb" style="display:flex;align-items:center;justify-content:center;color:#fff">🕊️</div><% } %>
+        <div class="info">
+          <h4><%= d.name %></h4>
+          <div class="muted" style="font-size:.88rem">قراءة وذِكر: <b><%= d.readCount %></b> · دعوات: <b><%= d.prayCount %></b></div>
+        </div>
+        <div class="btn-row">
+          <a class="btn ghost sm" href="/m/<%= d.id %>" target="_blank">فتح</a>
+          <a class="btn ghost sm" href="/admin/edit/<%= d.id %>">تعديل</a>
+          <form method="POST" action="/admin/reject/<%= d.id %>"><button class="btn ghost sm" type="submit">إخفاء</button></form>
+          <form method="POST" action="/admin/delete/<%= d.id %>" onsubmit="return confirm('حذف نهائي مع كل الأدعية؟')"><button class="btn danger sm" type="submit">حذف</button></form>
+        </div>
+      </div>
+    <% }); %>
+  <% } %>
+
+  <h2 style="color:var(--navy);margin-top:34px">🙈 مخفي <span class="tag"><%= hidden.length %></span></h2>
+  <% if (hidden.length === 0) { %>
+    <div class="card muted center">لا يوجد عناصر مخفية.</div>
+  <% } else { %>
+    <% hidden.forEach(function(d){ %>
+      <div class="admin-row">
+        <% if (d.photo) { %><img class="thumb" src="<%= d.photo %>" alt="" /><% } else { %><div class="thumb" style="display:flex;align-items:center;justify-content:center;color:#fff">🕊️</div><% } %>
+        <div class="info">
+          <h4><%= d.name %></h4>
+          <% if (d.bio) { %><div class="muted" style="font-size:.88rem"><%= d.bio %></div><% } %>
+        </div>
+        <div class="btn-row">
+          <a class="btn ghost sm" href="/m/<%= d.id %>" target="_blank">معاينة</a>
+          <a class="btn ghost sm" href="/admin/edit/<%= d.id %>">تعديل</a>
+          <form method="POST" action="/admin/approve/<%= d.id %>"><button class="btn sm" type="submit">↩ إعادة النشر</button></form>
+          <form method="POST" action="/admin/delete/<%= d.id %>" onsubmit="return confirm('حذف نهائي مع كل الأدعية؟')"><button class="btn danger sm" type="submit">حذف</button></form>
+        </div>
+      </div>
+    <% }); %>
+  <% } %>
+</section>
+<%- include('../partials/footer') %>

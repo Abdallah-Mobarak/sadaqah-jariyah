@@ -1,0 +1,71 @@
+<div class="adhkar-tool" data-for="<%= forId || '' %>">
+  <div class="dhikr-toggle">
+    <button class="btn ghost sm tgl active" data-time="morning" type="button">🌅 أذكار الصباح</button>
+    <button class="btn ghost sm tgl" data-time="evening" type="button">🌙 أذكار المساء</button>
+  </div>
+
+  <div class="dhikr-list" data-time="morning">
+    <% adhkar.morning.forEach(function(z, i){ %>
+      <div class="dhikr" data-count="<%= z.count %>" data-i="0">
+        <div class="text quran"><%= z.text %></div>
+        <% if (z.note) { %><div class="note">📌 <%= z.note %></div><% } %>
+        <div class="counter">
+          <span class="muted">اضغط للعدّ</span>
+          <span class="badge"><span class="cur">0</span> / <%= z.count %></span>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+
+  <div class="dhikr-list" data-time="evening" style="display:none">
+    <% adhkar.evening.forEach(function(z, i){ %>
+      <div class="dhikr" data-count="<%= z.count %>" data-i="0">
+        <div class="text quran"><%= z.text %></div>
+        <% if (z.note) { %><div class="note">📌 <%= z.note %></div><% } %>
+        <div class="counter">
+          <span class="muted">اضغط للعدّ</span>
+          <span class="badge"><span class="cur">0</span> / <%= z.count %></span>
+        </div>
+      </div>
+    <% }); %>
+  </div>
+</div>
+
+<script>
+(function(){
+  var root = document.currentScript.previousElementSibling;
+  while (root && !root.classList.contains('adhkar-tool')) root = root.previousElementSibling;
+  if (!root) return;
+  var forId = root.getAttribute('data-for');
+  var participated = false;
+
+  root.querySelectorAll('.tgl').forEach(function(b){
+    b.addEventListener('click', function(){
+      root.querySelectorAll('.tgl').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      root.querySelectorAll('.dhikr-list').forEach(function(l){
+        l.style.display = (l.getAttribute('data-time') === b.getAttribute('data-time')) ? '' : 'none';
+      });
+    });
+  });
+
+  root.querySelectorAll('.dhikr').forEach(function(card){
+    var target = parseInt(card.getAttribute('data-count'), 10);
+    var curEl = card.querySelector('.cur');
+    var hintEl = card.querySelector('.counter .muted');
+    card.addEventListener('click', function(){
+      var i = parseInt(card.getAttribute('data-i'), 10);
+      if (i >= target) return; // count complete — won't restart until page refresh
+      i++;
+      card.setAttribute('data-i', i);
+      curEl.textContent = i;
+      if (navigator.vibrate) navigator.vibrate(8);
+      if (i >= target) {
+        card.classList.add('done');
+        if (hintEl) hintEl.textContent = 'تم ✓';
+        if (!participated && forId) { participated = true; if (window.SJ) SJ.participate(forId); }
+      }
+    });
+  });
+})();
+</script>

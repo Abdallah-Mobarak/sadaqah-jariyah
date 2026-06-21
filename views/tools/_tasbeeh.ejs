@@ -1,0 +1,61 @@
+<div class="tasbeeh tasbeeh-tool" data-for="<%= forId || '' %>">
+  <div class="phrases">
+    <button class="btn ghost sm ph active" type="button">سُبْحَانَ اللَّهِ</button>
+    <button class="btn ghost sm ph" type="button">الْحَمْدُ لِلَّهِ</button>
+    <button class="btn ghost sm ph" type="button">اللَّهُ أَكْبَرُ</button>
+    <button class="btn ghost sm ph" type="button">لَا إِلَهَ إِلَّا اللَّهُ</button>
+    <button class="btn ghost sm ph" type="button">أَسْتَغْفِرُ اللَّهَ</button>
+  </div>
+  <div class="phrase current-phrase">سُبْحَانَ اللَّهِ</div>
+  <div class="count tcount">0</div>
+  <button class="tap-btn" type="button">سبّح</button>
+  <div style="margin-top:18px">
+    <button class="btn ghost sm reset" type="button">تصفير</button>
+    <span class="muted" style="margin-inline-start:10px">المجموع الكلي: <b class="total">0</b></span>
+  </div>
+</div>
+
+<script>
+(function(){
+  var root = document.currentScript.previousElementSibling;
+  while (root && !root.classList.contains('tasbeeh-tool')) root = root.previousElementSibling;
+  if (!root) return;
+  var forId = root.getAttribute('data-for');
+  var countEl = root.querySelector('.tcount');
+  var totalEl = root.querySelector('.total');
+  var phraseEl = root.querySelector('.current-phrase');
+  var tap = root.querySelector('.tap-btn');
+  var count = 0;
+  var total = parseInt(localStorage.getItem('sj_tasbeeh_total') || '0', 10);
+  var milestoneNotified = false;
+  totalEl.textContent = total;
+
+  tap.addEventListener('click', function(){
+    count++; total++;
+    countEl.textContent = count;
+    totalEl.textContent = total;
+    localStorage.setItem('sj_tasbeeh_total', total);
+    if (navigator.vibrate) navigator.vibrate(12);
+    if (count === 33 || count === 99 || count === 100) {
+      if (window.SJ) SJ.toast('ما شاء الله — ' + count + ' تسبيحة 🤍');
+    }
+    if (!milestoneNotified && count >= 33 && forId) {
+      milestoneNotified = true;
+      if (window.SJ) SJ.participate(forId);
+    }
+  });
+
+  root.querySelector('.reset').addEventListener('click', function(){
+    count = 0; countEl.textContent = 0; milestoneNotified = false;
+  });
+
+  root.querySelectorAll('.ph').forEach(function(b){
+    b.addEventListener('click', function(){
+      root.querySelectorAll('.ph').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      phraseEl.textContent = b.textContent;
+      count = 0; countEl.textContent = 0; milestoneNotified = false;
+    });
+  });
+})();
+</script>

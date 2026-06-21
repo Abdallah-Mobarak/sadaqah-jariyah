@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Data and uploads (per-server — not committed)
+data/db.json
+data/db.json.tmp
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Environment and secrets
+.env
+.env.local
+
+# Logs and tooling
+npm-debug.log*
+yarn-error.log*
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

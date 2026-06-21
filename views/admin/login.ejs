@@ -1,0 +1,16 @@
+<%- include('../partials/head') %>
+<section class="section narrow" style="margin:60px auto">
+  <div class="card">
+    <h1 style="color:var(--navy);margin-top:0">🔒 دخول المشرف</h1>
+    <p class="muted">أدخل كلمة المرور لإدارة الطلبات والمنشورات.</p>
+    <% if (error) { %><div class="card" style="background:#fceeee;border-color:#f0caca;color:var(--danger)"><%= error %></div><% } %>
+    <form method="POST" action="/admin/login">
+      <label for="password">كلمة المرور</label>
+      <input type="password" id="password" name="password" required autofocus />
+      <div style="margin-top:18px"><button class="btn block" type="submit">دخول</button></div>
+    </form>
+    <div style="margin-top:16px"><a href="/">← العودة للموقع</a></div>
+  </div>
+</section>
+</body>
+</html>

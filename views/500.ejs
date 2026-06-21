@@ -1,0 +1,9 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<section class="section center" style="padding:60px 0">
+  <div style="font-size:3rem">🤍</div>
+  <h1 style="color:var(--navy)">حدث خطأ غير متوقع</h1>
+  <p class="muted"><%= typeof message !== 'undefined' && message ? message : 'نعتذر، حصل خطأ. حاول مرة أخرى.' %></p>
+  <a class="btn" href="/">العودة للرئيسية</a>
+</section>
+<%- include('partials/footer') %>

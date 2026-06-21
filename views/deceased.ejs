@@ -1,0 +1,102 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<%
+  var known = { quran:'القرآن', adhkar:'الأذكار', tasbeeh:'السبحة', salah:'الصلاة على النبي', dua:'ادعُ له' };
+  var worship = ['quran','adhkar','tasbeeh','salah'];
+  var hasDeeds = d.deeds && d.deeds.length;
+  var chosenWorship = hasDeeds ? d.deeds.filter(function(k){ return worship.indexOf(k) > -1; }) : worship;
+  // "Pray for them" is always available (the closest deed). It comes first and active if chosen by the submitter (or if nothing was specified).
+  var duaFirst = !hasDeeds || d.deeds.indexOf('dua') > -1;
+  var tabs = duaFirst ? ['dua'].concat(chosenWorship) : chosenWorship.concat(['dua']);
+%>
+
+<% if (d.status !== 'approved') { %>
+  <div class="card" style="background:#fdf6e9;border-color:#f0e2c2;margin-top:18px">
+    <b>معاينة (قيد المراجعة)</b> — هذه الصفحة غير منشورة للعامة بعد. يمكنك نشرها من <a href="/admin">لوحة التحكم</a>.
+  </div>
+<% } %>
+
+<section class="person-hero">
+  <div class="avatar">
+    <% if (d.photo) { %><img src="<%= d.photo %>" alt="<%= d.name %>" /><% } else { %><span>🕊️</span><% } %>
+  </div>
+  <h1 class="name-ar"><%= d.name %></h1>
+  <% if (d.bio) { %><p class="bio"><%= d.bio %></p><% } %>
+  <div class="stat-row">
+    <div class="stat"><b class="read-count"><%= d.readCount %></b><small>قراءة وذِكر</small></div>
+    <div class="stat"><b class="pray-count"><%= d.prayCount %></b><small>دعوة</small></div>
+  </div>
+  <div class="btn-row" style="justify-content:center">
+    <button class="btn ghost sm" id="shareWhatsapp" type="button">
+      <svg class="wa-icon" viewBox="0 0 32 32" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M16.04 4C9.93 4 4.98 8.95 4.98 15.06c0 2.05.56 4.05 1.62 5.8L4 28l7.32-2.5a11 11 0 0 0 4.72 1.06h.01c6.11 0 11.06-4.95 11.06-11.06C27.11 8.95 22.15 4 16.04 4zm0 20.2c-1.5 0-2.97-.4-4.25-1.16l-.3-.18-4.34 1.48 1.5-4.23-.2-.32a9.13 9.13 0 0 1-1.4-4.85c0-5.06 4.12-9.18 9.2-9.18 2.46 0 4.77.96 6.5 2.7a9.1 9.1 0 0 1 2.69 6.5c0 5.07-4.12 9.18-9.1 9.18zm5.05-6.87c-.27-.14-1.63-.8-1.88-.9-.25-.09-.43-.13-.62.14-.18.27-.71.9-.87 1.08-.16.18-.32.2-.59.07-.27-.14-1.16-.43-2.2-1.36-.81-.72-1.36-1.62-1.52-1.89-.16-.27-.02-.42.12-.55.12-.12.27-.32.4-.48.14-.16.18-.27.27-.45.09-.18.05-.34-.02-.48-.07-.14-.62-1.49-.85-2.04-.22-.53-.45-.46-.62-.47l-.53-.01c-.18 0-.48.07-.73.34-.25.27-.96.94-.96 2.3 0 1.36.98 2.67 1.12 2.85.14.18 1.93 2.95 4.68 4.14.65.28 1.16.45 1.56.58.65.21 1.25.18 1.72.11.52-.08 1.63-.67 1.86-1.31.23-.64.23-1.19.16-1.31-.07-.12-.25-.18-.52-.32z"/></svg>
+      شارك عبر واتساب
+    </button>
+    <button class="btn ghost sm" id="copyLink" type="button">🔗 نسخ الرابط</button>
+  </div>
+  <p class="hint center" style="max-width:520px;margin:14px auto 0">
+    ادعُ له، أو اقرأ وسبّح من هنا، وانوِ أن يكون الأجر <span class="for-name">لـ <b class="mname"><%= d.name %></b></span> بإذن الله.
+  </p>
+</section>
+
+<div class="tabs">
+  <% tabs.forEach(function(k, i){ %>
+    <button class="tab-btn <%= i===0?'active':'' %>" data-tab="<%= k %>"><%= known[k] %></button>
+  <% }); %>
+</div>
+
+<% tabs.forEach(function(k, i){ %>
+  <div class="tab-panel <%= i===0?'active':'' %>" data-panel="<%= k %>" <%= k==='dua'?'id="duas"':'' %>>
+    <% if (k === 'dua') { %>
+      <div class="card">
+        <h3 style="margin-top:0;color:var(--navy)">اكتب دعوة <span class="for-name">لـ <span class="mname"><%= d.name %></span></span></h3>
+        <form id="duaForm" method="POST" action="/m/<%= d.id %>/dua">
+          <label for="duaName">اسمك (اختياري)</label>
+          <input type="text" id="duaName" name="name" maxlength="40" placeholder="مثال: من محبيه" />
+          <label for="duaText">دعاؤك</label>
+          <textarea id="duaText" name="text" maxlength="500" required placeholder="اللهم اغفر له وارحمه وأسكنه فسيح جناتك…"></textarea>
+          <div style="margin-top:14px"><button class="btn block" type="submit">أضف الدعاء 🤲</button></div>
+        </form>
+      </div>
+      <h3 style="color:var(--navy)">دعوات الناس <span class="muted" style="font-weight:400">(<%= duas.length %>)</span></h3>
+      <div id="duaList">
+        <% if (duas.length === 0) { %>
+          <div class="dua-empty">كن أول من يدعو له. 🤍</div>
+        <% } else { %>
+          <% duas.forEach(function(x){ %>
+            <div class="dua-item">
+              <div class="who"><%= x.name %> <span class="when">· <%= new Date(x.createdAt).toLocaleDateString('ar-EG') %></span></div>
+              <div class="txt"><%= x.text %></div>
+              <div class="dua-foot">
+                <button class="like-btn" data-id="<%= x.id %>" type="button" aria-label="أعجبني">
+                  <svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                  <span class="like-count"><%= x.likes || 0 %></span>
+                </button>
+                <% if (isAdmin) { %>
+                  <form method="POST" action="/admin/dua/delete/<%= x.id %>" style="margin:0">
+                    <button class="btn danger sm" type="submit">حذف</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% }); %>
+        <% } %>
+      </div>
+    <% } else { %>
+      <div class="card">
+        <% if (k === 'quran') { %><%- include('tools/_quran', { forId: d.id }) %>
+        <% } else if (k === 'adhkar') { %><%- include('tools/_adhkar', { forId: d.id, adhkar: adhkar }) %>
+        <% } else if (k === 'tasbeeh') { %><%- include('tools/_tasbeeh', { forId: d.id }) %>
+        <% } else if (k === 'salah') { %><%- include('tools/_salah', { forId: d.id }) %>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+<% }); %>
+
+<div style="margin:30px 0"><a href="/" class="btn ghost sm">← رجوع للرئيسية</a></div>
+
+<script>
+  window.SJ_DECEASED = { id: '<%= d.id %>', name: '<%= d.name.replace(/'/g, "\\'") %>' };
+</script>
+<%- include('partials/footer') %>

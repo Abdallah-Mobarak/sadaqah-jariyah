@@ -1,0 +1,11 @@
+# Normalize line endings across systems (the server is usually Linux)
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

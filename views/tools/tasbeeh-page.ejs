@@ -1,0 +1,10 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<section class="section">
+  <h1 style="color:var(--navy)">📿 السبحة الإلكترونية</h1>
+  <p class="muted">سبّح واحتسب الأجر. يمكنك اختيار صيغة التسبيح من الأعلى.</p>
+  <div class="card">
+    <%- include('_tasbeeh', { forId: forId }) %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

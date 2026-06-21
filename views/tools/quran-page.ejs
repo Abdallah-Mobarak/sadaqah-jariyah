@@ -1,0 +1,10 @@
+<%- include('../partials/head') %>
+<%- include('../partials/header') %>
+<section class="section">
+  <h1 style="color:var(--navy)">📖 المصحف الإلكتروني</h1>
+  <p class="muted">اقرأ من كتاب الله، وانوِ إهداء ثواب قراءتك لمن تحب.</p>
+  <div class="card">
+    <%- include('_quran', { forId: forId }) %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

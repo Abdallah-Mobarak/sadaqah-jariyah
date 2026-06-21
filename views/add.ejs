@@ -1,0 +1,43 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+<section class="section narrow" style="margin-inline:auto">
+  <% if (sent) { %>
+    <div class="card center">
+      <div style="font-size:3rem">🤍</div>
+      <h1 style="color:var(--navy)">تم إرسال الطلب</h1>
+      <p class="muted">سيظهر اسم المتوفّى على الموقع بعد مراجعته والموافقة عليه. جزاك الله خيرًا.</p>
+      <div class="btn-row" style="justify-content:center">
+        <a class="btn" href="/">العودة للرئيسية</a>
+        <a class="btn ghost" href="/add">إضافة آخر</a>
+      </div>
+    </div>
+  <% } else { %>
+    <h1 style="color:var(--navy)">➕ أضف اسم متوفّى</h1>
+    <p class="muted">أضف من تحب لتُهدى إليه القراءة والأذكار والدعاء. سيُراجَع الطلب قبل نشره.</p>
+    <% if (error) { %><div class="card" style="background:#fceeee;border-color:#f0caca;color:var(--danger)"><%= error %></div><% } %>
+    <form class="card" method="POST" action="/add" enctype="multipart/form-data">
+      <label for="name">اسم المتوفّى <span style="color:var(--danger)">*</span></label>
+      <input type="text" id="name" name="name" required maxlength="80" placeholder="مثال: الحاج محمد عبد الله" />
+
+      <label for="bio">كلمة عنه (اختياري)</label>
+      <textarea id="bio" name="bio" maxlength="400" placeholder="كلمة طيبة، تاريخ الوفاة، أو دعاء قصير…"></textarea>
+
+      <label for="photo">صورته (اختياري)</label>
+      <input type="file" id="photo" name="photo" accept="image/*" />
+      <div class="hint">الحد الأقصى 4 ميجابايت. يمكنك تركها فارغة.</div>
+
+      <label>الأعمال التي تُهدى إليه</label>
+      <div class="checks">
+        <% DEEDS.forEach(function(deed){ %>
+          <label class="check">
+            <input type="checkbox" name="deeds" value="<%= deed.key %>" checked />
+            <%= deed.label %>
+          </label>
+        <% }); %>
+      </div>
+
+      <div style="margin-top:22px"><button class="btn block" type="submit">إرسال للمراجعة</button></div>
+    </form>
+  <% } %>
+</section>
+<%- include('partials/footer') %>

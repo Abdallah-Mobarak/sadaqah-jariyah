@@ -1,0 +1,106 @@
+<div class="quran-tool" data-for="<%= forId || '' %>">
+  <div class="quran-controls">
+    <select class="surah-select" aria-label="اختر السورة">
+      <option value="">… جارٍ تحميل السور</option>
+    </select>
+    <button class="btn ghost sm prev-surah" type="button">السابقة</button>
+    <button class="btn ghost sm next-surah" type="button">التالية</button>
+  </div>
+  <div class="surah-text quran-output">
+    <p class="muted center">اختر سورة لتبدأ القراءة، وانوِ إهداء ثوابها لمن أحببت.</p>
+  </div>
+  <p class="hint">المصدر: API القرآن الكريم (alquran.cloud). إن لم يظهر النص تأكد من اتصال الإنترنت.</p>
+</div>
+
+<script>
+(function(){
+  var root = document.currentScript.previousElementSibling;
+  while (root && !root.classList.contains('quran-tool')) root = root.previousElementSibling;
+  if (!root) return;
+  var sel = root.querySelector('.surah-select');
+  var out = root.querySelector('.quran-output');
+  var forId = root.getAttribute('data-for');
+  var participated = false;
+
+  function markRead(){
+    if (participated || !forId) return;
+    participated = true;
+    if (window.SJ) SJ.participate(forId);
+  }
+
+  fetch('https://api.alquran.cloud/v1/surah')
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      sel.innerHTML = '<option value="">اختر السورة…</option>';
+      j.data.forEach(function(s){
+        var o = document.createElement('option');
+        o.value = s.number;
+        o.textContent = s.number + '. ' + s.name + ' (' + s.englishName + ')';
+        sel.appendChild(o);
+      });
+    })
+    .catch(function(){ sel.innerHTML = '<option value="">تعذّر تحميل قائمة السور</option>'; });
+
+  function loadSurah(n){
+    if (!n) return;
+    out.innerHTML = '<p class="muted center">… جارٍ التحميل</p>';
+    fetch('https://api.alquran.cloud/v1/surah/' + n + '/quran-uthmani')
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        var d = j.data;
+        var html = '';
+        if (d.number !== 1 && d.number !== 9) {
+          html += '<div class="basmala">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>';
+        }
+        html += '<div class="quran">';
+        d.ayahs.forEach(function(a){
+          var t = a.text;
+          // strip the basmala from the first ayah (it's shown above) — except Al-Fatiha where it is a numbered ayah
+          if (d.number !== 1 && a.numberInSurah === 1) {
+            t = stripBasmala(t);
+          }
+          html += t + ' <span class="ayah-num">﴿' + toAr(a.numberInSurah) + '﴾</span> ';
+        });
+        html += '</div>';
+        out.innerHTML = html;
+        out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        markRead();
+      })
+      .catch(function(){ out.innerHTML = '<p class="muted center">تعذّر تحميل السورة، حاول مرة أخرى.</p>'; });
+  }
+
+  function toAr(num){
+    return String(num).replace(/[0-9]/g, function(d){ return '٠١٢٣٤٥٦٧٨٩'[d]; });
+  }
+
+  // remove a leading basmala regardless of diacritics
+  function stripBasmala(text){
+    function isMark(code){
+      return (code >= 0x0610 && code <= 0x061A) || (code >= 0x064B && code <= 0x065F) ||
+             code === 0x0670 || code === 0x0640 || (code >= 0x06D6 && code <= 0x06ED);
+    }
+    var skeleton = '', map = [];
+    for (var i = 0; i < text.length; i++){
+      var ch = text[i], code = text.charCodeAt(i);
+      if (isMark(code)) continue;
+      if (ch === ' ' || ch === ' ' || ch === '‏' || ch === '‎') continue;
+      if (code === 0x0671) ch = 'ا'; // alef-wasla -> plain alef
+      skeleton += ch; map.push(i);
+    }
+    var target = 'بسماللهالرحمنالرحيم'; // basmala letter-skeleton without diacritics
+    if (skeleton.indexOf(target) === 0){
+      var cut = (target.length < map.length) ? map[target.length] : text.length;
+      return text.slice(cut).replace(/^[\s ‏‎]+/, '');
+    }
+    return text;
+  }
+
+  sel.addEventListener('change', function(){ loadSurah(sel.value); });
+  root.querySelector('.next-surah').addEventListener('click', function(){
+    var n = parseInt(sel.value || '0', 10) + 1; if (n >= 1 && n <= 114) { sel.value = n; loadSurah(n); }
+  });
+  root.querySelector('.prev-surah').addEventListener('click', function(){
+    var n = parseInt(sel.value || '0', 10) - 1; if (n >= 1 && n <= 114) { sel.value = n; loadSurah(n); }
+  });
+})();
+</script>

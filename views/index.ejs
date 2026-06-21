@@ -1,0 +1,67 @@
+<%- include('partials/head') %>
+<%- include('partials/header') %>
+
+<section class="hero">
+  <h1>صدقة جارية</h1>
+  <div class="ayah">﴿ مَنْ كَانَ يُرِيدُ ثَوَابَ الدُّنْيَا وَالْآخِرَةِ فَعِنْدَ اللَّهِ ثَوَابُ الدُّنْيَا وَالْآخِرَةِ ﴾</div>
+  <hr class="divider" />
+  <p>اقرأ القرآن والأذكار، وسبّح، وادعُ لمن أحببت من المتوفّين — وانوِ أن يكون الأجر لهم بإذن الله. كل عمل تعمله هنا بنيّتك، فاحتسبه عند الله.</p>
+  <div class="btn-row" style="justify-content:center">
+    <a class="btn gold" href="/add">➕ أضف اسم متوفّى</a>
+    <a class="btn ghost" href="/quran">📖 افتح المصحف</a>
+  </div>
+</section>
+
+<section class="section">
+  <h2 style="text-align:center;color:var(--navy)">تُهدى إليهم القراءة والدعاء</h2>
+  <% if (list.length === 0) { %>
+    <div class="card center muted">
+      <p>لا توجد صفحات منشورة بعد.</p>
+      <p>كن أول من يضيف صفحة لمن أحب. <a href="/add">أضف الآن</a></p>
+    </div>
+  <% } else { %>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="🔍 ابحث باسم المتوفّى…" autocomplete="off" />
+    </div>
+    <div class="grid" id="peopleGrid">
+      <% list.forEach(function(d){ %>
+        <a class="person-card" href="/m/<%= d.id %>" data-name="<%= d.name %>">
+          <% if (d.photo) { %>
+            <div class="photo"><img src="<%= d.photo %>" alt="<%= d.name %>" loading="lazy" /></div>
+          <% } else { %>
+            <div class="photo placeholder"><span>🕊️</span></div>
+          <% } %>
+          <div class="body">
+            <h3 class="name-ar"><%= d.name %></h3>
+            <% if (d.bio) { %><div class="bio"><%= d.bio.length > 90 ? d.bio.slice(0,90) + '…' : d.bio %></div><% } %>
+            <div class="meta">شارك في الدعاء له <b><%= d.prayCount + d.readCount %></b></div>
+          </div>
+        </a>
+      <% }); %>
+    </div>
+    <div id="noResults" class="card center muted" style="display:none">لا يوجد متوفّى بهذا الاسم.</div>
+  <% } %>
+</section>
+
+<section class="section">
+  <div class="grid">
+    <a class="card center" href="/quran" style="text-decoration:none">
+      <div style="font-size:2rem">📖</div><h3 style="color:var(--navy);margin:8px 0 4px">المصحف</h3>
+      <div class="muted">اقرأ من القرآن الكريم</div>
+    </a>
+    <a class="card center" href="/adhkar" style="text-decoration:none">
+      <div style="font-size:2rem">🌙</div><h3 style="color:var(--navy);margin:8px 0 4px">الأذكار</h3>
+      <div class="muted">أذكار الصباح والمساء</div>
+    </a>
+    <a class="card center" href="/tasbeeh" style="text-decoration:none">
+      <div style="font-size:2rem">📿</div><h3 style="color:var(--navy);margin:8px 0 4px">السبحة</h3>
+      <div class="muted">سبّح واحتسب الأجر</div>
+    </a>
+    <a class="card center" href="/prayer-times" style="text-decoration:none">
+      <div style="font-size:2rem">🕌</div><h3 style="color:var(--navy);margin:8px 0 4px">المواقيت</h3>
+      <div class="muted">مواقيت الصلاة حسب مدينتك</div>
+    </a>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

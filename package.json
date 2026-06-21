@@ -1,0 +1,28 @@
+{
+  "name": "sadaqah-jariyah",
+  "version": "1.0.0",
+  "description": "موقع صدقة جارية — اقرأ وأهدِ الثواب لمن أحببت من المتوفّين",
+  "main": "server.js",
+  "private": true,
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node db/seed.js"
+  },
+  "keywords": [
+    "sadaqah",
+    "quran",
+    "adhkar",
+    "islamic"
+  ],
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "multer": "^2.2.0"
+  }
+}
