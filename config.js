@@ -20,7 +20,7 @@ module.exports = {
     uploads: path.join(__dirname, 'public', 'uploads'),
   },
 
-  upload: { maxSize: 4 * 1024 * 1024 }, // 4 MB
+  upload: { maxSize: 5 * 1024 * 1024 }, // 5 MB
 
   // Deeds the submitter can choose when adding a deceased (labels shown to users, in Arabic)
   deeds: [

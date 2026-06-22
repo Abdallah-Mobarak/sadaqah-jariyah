@@ -240,7 +240,7 @@ app.use((err, req, res, next) => {
   console.error('Unexpected error:', err.message);
   if (res.headersSent) return next(err);
   // Image upload errors (too large / unsupported type)
-  const msg = err.code === 'LIMIT_FILE_SIZE' ? 'حجم الصورة كبير (الحد 4 ميجابايت).' : null;
+  const msg = err.code === 'LIMIT_FILE_SIZE' ? 'حجم الصورة كبير (الحد 5 ميجابايت).' : null;
   res.status(500).render('500', { title: 'خطأ', message: msg });
 });
 

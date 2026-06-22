@@ -10,6 +10,7 @@ public/uploads/*
 # Environment and secrets
 .env
 .env.local
+DEPLOYMENT-NOTES.md
 
 # Logs and tooling
 npm-debug.log*
